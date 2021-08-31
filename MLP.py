@@ -1,3 +1,5 @@
+import numpy as np
+
 from Layers import *
 from ObjectiveFuncs import *
 from tqdm import trange
@@ -39,19 +41,19 @@ class MLP:
 
     def train(self):
 
-        for i in trange(epochs):
+        for _ in trange(epochs):
             fp = self.inp_test
-            for layer in self.arch[1:]:
+            for layer in self.arch[1:-1]:
                 fp = layer.forwardPropagate(fp)
             self.test_y_hat = fp
 
             fp = self.inp_train
-            for layer in self.arch[1:]:
+            for layer in self.arch[1:-1]:
                 fp = layer.forwardPropagate(fp)
             self.train_y_hat = fp
 
             fp = self.arch[-1].gradient(self.train_y_hat)
-            for layer in self.arch[-2:1: -1]:
+            for layer in self.arch[-2:0: -1]:
                 fp = layer.backwardPropagate(fp)
 
     def layerFactory(self, classStr):
@@ -77,5 +79,9 @@ class MLP:
             raise AttributeError
 
     def calculate_Accuracies(self):
-        print(f'\nTraining Accuracy: {accuracy_score(self.train_y, self.train_y_hat):.2f}')
+        total_train = np.sum(np.equal(tyh := one_hot_decoder(self.train_y_hat), one_hot_decoder(self.train_y)))
+        total_test = np.sum(np.equal(vyh := one_hot_decoder(self.test_y_hat), one_hot_decoder(self.test_y)))
+        print(f'Train Accuracies: {total_train * 100 / tyh.shape[0]}%')
+        print(f'Validation Accuracies: {total_test * 100 / vyh.shape[0]}%')
+        # print(f'\nTraining Accuracy: {accuracy_score(one_hot_decoder(self.train_y), self.train_y_hat):.2f}')
 
