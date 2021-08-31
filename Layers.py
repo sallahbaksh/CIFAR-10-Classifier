@@ -59,6 +59,12 @@ class FullyConnectedLayer:
         # self.biases -= avg * (np.ones((1, gradient.shape[0])) @ gradient)
         return gradout
 
+    def simpleBackwardPropagate(self, gradient: npt.ArrayLike, learning_rate: float):
+        xx = learning_rate / gradient.shape[0]
+        self.weights -= xx * (self.input_layer.T @ gradient)
+        self.biases -= xx * (np.ones((1, gradient.shape[0])) @ gradient)
+        return gradient @ self.gradient()
+
     def gradient(self):
         return self.weights.T
 
