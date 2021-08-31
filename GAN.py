@@ -1,17 +1,9 @@
-from statistics import mean
-from unicodedata import digit
 import pandas as pd
 import numpy as np
-from torch import softmax
-import imageio
-from sympy import fps
 from tqdm import trange
-from fully_connected import fully_connected
-from logistic_loss import logistic_loss
+from Layers import *
+from ObjectiveFuncs import *
 from matplotlib import pyplot as plt
-from log_loss import log_loss
-from relu_layer import relu_layer
-from sigmoid_layer import sigmoid_layer
 
 
 class GAN:
@@ -31,22 +23,27 @@ class GAN:
         self.batches = self.xtr.shape[0] // self.batch_size
 
         # initializing common layer
-        self.common_fcl = fully_connected(self.xtr.shape[1], self.xtr.shape[1])
+        self.common_fcl = FullyConnectedLayer(
+            self.xtr.shape[1], self.xtr.shape[1], self.eta)
+        self.common_tanh = TanhLayer(self.common_fcl.forwardPropagate(self.xtr))
 
         # initializing discriminator
-        self.disc_fcl = fully_connected(self.xtr.shape[1], 1)
-        self.disc_sigmoid = sigmoid_layer()
+        self.disc_fcl = FullyConnectedLayer(self.xtr.shape[1], 1, self.eta)
+        self.disc_sigmoid = SigmoidLayer(self.disc_fcl.forwardPropagate(
+            self.common_tanh.forwardPropagate(self.common_fcl.forwardPropagate(self.xtr))))
         self.disc_log_loss = None
 
         # initializing classifier
-        self.class_fcl = fully_connected(self.xtr.shape[1],10)
-        self.class_sm = softmax()
+        self.class_fcl = FullyConnectedLayer(self.xtr.shape[1], 10, self.eta)
+        self.class_sm = SoftmaxLayer(self.class_fcl.forwardPropagate(
+            self.common_tanh.forwardPropagate(self.common_fcl.forwardPropagate(self.xtr))))
         
 
         # initializing generator
-        self.gen_fcl = fully_connected(self.xtr.shape[1], self.xtr.shape[1])
-        self.gen_relu = relu_layer()
-        self.gen_logistic_loss = logistic_loss()
+        self.gen_fcl = FullyConnectedLayer(
+            self.xtr.shape[1], self.xtr.shape[1], self.eta)
+        self.gen_relu = ReLuLayer(None)
+        self.gen_logistic_loss = ()
 
         # lists to track loss
         self.gen_loss = []
@@ -106,9 +103,6 @@ class GAN:
             gen_output = self.disc_forward_propagate(gen_output)
             self.gen_backward_propagate(gen_output)
             self.gen_loss.append(self.gen_logistic_loss.eval(gen_output))
-
-
-        imageio.mimsave(f"../videos/GAN{self.digit}.mp4", images, fps=10, macro_block_size=1)
 
 
     def display_graph(self):

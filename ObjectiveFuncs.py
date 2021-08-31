@@ -63,3 +63,17 @@ class LeastSquares:
 
     def __repr__(self):
         return self.__class__.__name__
+
+class LogisticLoss:
+    def __init__(self):
+        self.X = None
+
+    def forwardPropagate(self, Y):
+        self.forward_prop = Y
+        return self.forward_prop
+
+    def eval(self, yhat):
+        return np.average(-np.log(yhat + EPSILON))
+
+    def gradient(self, yhat):
+        return -np.divide(1, yhat + EPSILON)
