@@ -55,12 +55,11 @@ class MLP:
             fp = self.arch[-1].gradient(self.train_y_hat)
             for layer in self.arch[-2:0: -1]:
                 fp = layer.backwardPropagate(fp)
-
+                
     def layerFactory(self, class_str):
         v = [0, 0, 0]
         layer = {
             'Input': InputLayer(self.train_X),
-            'FullyConnected': FullyConnectedLayer(int(v[1]), int(v[2]), self.eta),
             'Sigmoid': SigmoidLayer(None),
             'ReLu': ReLuLayer(None),
             'Softmax': SoftmaxLayer(None),
@@ -71,7 +70,7 @@ class MLP:
         }
         
         if (v := class_str.split())[0] == 'FullyConnected':
-            return layer[v[0]]
+            return FullyConnectedLayer(int(v[1]), int(v[2]), self.eta)
         elif class_str in layer:
             return layer[class_str]
         else:
