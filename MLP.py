@@ -79,5 +79,5 @@ class MLP:
     def calculate_Accuracies(self):
         total_train = np.sum(np.equal(tyh := one_hot_decoder(self.train_y_hat), one_hot_decoder(self.train_Y)))
         total_test = np.sum(np.equal(vyh := one_hot_decoder(self.test_y_hat), one_hot_decoder(self.test_Y)))
-        print(f'Train Accuracies: {total_train * 100 / tyh.shape[0]}%')
-        print(f'Validation Accuracies: {total_test * 100 / vyh.shape[0]}%')
+        print(f'Train Accuracy: {total_train * 100 / tyh.shape[0]}%')
+        print(f'Validation Accuracy: {total_test * 100 / vyh.shape[0]}%')
