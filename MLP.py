@@ -15,11 +15,11 @@ def one_hot_decoder(x):
 
 
 class MLP:
-    def __init__(self, tsx, tsy, vsx, vsy, eta, epochs):
-        self.train_y = one_hot_encoder(tsy)
-        self.test_y = one_hot_encoder(vsy)
-        self.test_x = vsx
-        self.train_x = tsx
+def __init__(self, train_X, train_Y, test_X, test_Y, eta, epochs):
+        self.train_Y = one_hot_encoder(train_Y)
+        self.test_Y = one_hot_encoder(test_Y)
+        self.test_X = test_X
+        self.train_X = train_X
         self.eta = eta
         self.epochs = epochs
         self.arch = []
@@ -33,9 +33,8 @@ class MLP:
                          The fully connected layer should display an input layer output layer (ex: FullyConnected 25)
         """
         self.arch = list(map(self.layerFactory, list(map(str.strip, architecture.split(',')))))
-        # [print(x) for x in self.arch]
-        self.inp_train = self.arch[0].forwardPropagate(self.train_x)
-        self.inp_test = self.arch[0].forwardPropagate(self.test_x)
+        self.inp_train = self.arch[0].forwardPropagate(self.train_X)
+        self.inp_test = self.arch[0].forwardPropagate(self.test_X)
         fp = self.inp_train
         for layer in self.arch[1:]:
             fp = layer.forwardPropagate(fp)
@@ -79,8 +78,8 @@ class MLP:
             raise AttributeError
 
     def calculate_Accuracies(self):
-        total_train = np.sum(np.equal(tyh := one_hot_decoder(self.train_y_hat), one_hot_decoder(self.train_y)))
-        total_test = np.sum(np.equal(vyh := one_hot_decoder(self.test_y_hat), one_hot_decoder(self.test_y)))
+        total_train = np.sum(np.equal(tyh := one_hot_decoder(self.train_y_hat), one_hot_decoder(self.train_Y)))
+        total_test = np.sum(np.equal(vyh := one_hot_decoder(self.test_y_hat), one_hot_decoder(self.test_Y)))
         print(f'Train Accuracies: {total_train * 100 / tyh.shape[0]}%')
         print(f'Validation Accuracies: {total_test * 100 / vyh.shape[0]}%')
         # print(f'\nTraining Accuracy: {accuracy_score(one_hot_decoder(self.train_y), self.train_y_hat):.2f}')
