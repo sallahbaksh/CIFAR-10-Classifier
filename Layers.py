@@ -2,6 +2,7 @@
 
 import numpy as np
 
+
 class InputLayer:
     def __init__(self, input_layer):
         self.mean = np.mean(input_layer, axis=0)
@@ -135,6 +136,28 @@ class TanhLayer:
     def gradient(self):
         g = self.forwardPropagate(self.input_layer)
         return 1 - g * g
+
+    def __repr__(self):
+        return self.__class__.__name__
+
+
+class DropoutLayer:
+    def __init__(self, inp, p=0.5):
+        self.input_layer = inp
+        self.p = p
+        self.mask = None
+
+    def forwardPropagate(self, input_layer):
+        self.input_layer = input_layer
+        self.mask = np.random.binomial(1, self.p, size=input_layer.shape) / self.p
+        out = np.multiply(input_layer, self.mask)
+        return out.reshape(input_layer.shape)
+
+    def backwardPropagate(self, in_grad):
+        return np.multiply(in_grad, self.gradient())
+
+    def gradient(self):
+        return self.mask
 
     def __repr__(self):
         return self.__class__.__name__

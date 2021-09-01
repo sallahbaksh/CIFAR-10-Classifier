@@ -5,7 +5,6 @@ from ObjectiveFuncs import *
 from tqdm import trange
 
 
-
 def one_hot_encoder(data):
     return np.squeeze(np.eye(np.max(data) + 1)[data.reshape(-1)])
 
@@ -41,7 +40,6 @@ class MLP:
             fp = layer.forwardPropagate(fp)
 
     def train(self):
-
         for _ in trange(self.epochs):
             fp = self.inp_test
             for layer in self.arch[1:-1]:
@@ -66,11 +64,13 @@ class MLP:
             'Tanh': TanhLayer(None),
             'CrossEntropy': CrossEntropy(self.train_Y),
             'LogLoss': LogLoss(self.train_Y),
-            'LeastSquares': LeastSquares(self.train_Y)
+            'LeastSquares': LeastSquares(self.train_Y),
         }
 
         if (v := class_str.split())[0] == 'FullyConnected':
             return FullyConnectedLayer(int(v[1]), int(v[2]), self.eta)
+        elif (v := class_str.split())[0] == 'DropOut':
+            return DropoutLayer(None, float(v[1]))
         elif class_str in layer:
             return layer[class_str]
         else:
