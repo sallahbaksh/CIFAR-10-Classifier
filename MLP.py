@@ -57,25 +57,24 @@ class MLP:
             for layer in self.arch[-2:0: -1]:
                 fp = layer.backwardPropagate(fp)
 
-    def layerFactory(self, classStr):
-        if (v := classStr.split())[0] == "FullyConnected":
-            return FullyConnectedLayer(int(v[1]), int(v[2]), self.eta)
-        elif classStr == "Sigmoid":
-            return SigmoidLayer(None)
-        elif classStr == "ReLu":
-            return ReLuLayer(None)
-        elif classStr == "Softmax":
-            return SoftmaxLayer(None)
-        elif classStr == "Tanh":
-            return TanhLayer(None)
-        elif classStr == "CrossEntropy":
-            return CrossEntropy(self.train_y)
-        elif classStr == "LogLoss":
-            return LogLoss(self.train_y)
-        elif classStr == "LeastSquares":
-            return LeastSquares(self.train_y)
-        elif classStr == "Input":
-            return InputLayer(self.train_x)
+    def layerFactory(self, class_str):
+        v = [0, 0, 0]
+        layer = {
+            'Input': InputLayer(self.train_X),
+            'FullyConnected': FullyConnectedLayer(int(v[1]), int(v[2]), self.eta),
+            'Sigmoid': SigmoidLayer(None),
+            'ReLu': ReLuLayer(None),
+            'Softmax': SoftmaxLayer(None),
+            'Tanh': TanhLayer(None),
+            'CrossEntropy': CrossEntropy(self.train_Y),
+            'LogLoss': LogLoss(self.train_Y),
+            'LeastSquares': LeastSquares(self.train_Y)
+        }
+        
+        if (v := class_str.split())[0] == 'FullyConnected':
+            return layer[v[0]]
+        elif class_str in layer:
+            return layer[class_str]
         else:
             raise AttributeError
 
