@@ -13,7 +13,7 @@ def one_hot_decoder(x):
     return np.argmax(x, axis=1)
 
 
-class MLP:
+class NeuralNetwork:
     def __init__(self, train_X, train_Y, test_X, test_Y, eta, epochs):
         self.train_Y = one_hot_encoder(train_Y)
         self.test_Y = one_hot_encoder(test_Y)
