@@ -4,7 +4,6 @@ from Layers import *
 from ObjectiveFuncs import *
 from tqdm import trange
 from sklearn.metrics import accuracy_score
-learning_rate, epochs = 10 ** (-2), 2_000
 
 
 def one_hot_encoder(data):
@@ -16,11 +15,13 @@ def one_hot_decoder(x):
 
 
 class MLP:
-    def __init__(self, tsx, tsy, vsx, vsy):
+    def __init__(self, tsx, tsy, vsx, vsy, eta, epochs):
         self.train_y = one_hot_encoder(tsy)
         self.test_y = one_hot_encoder(vsy)
         self.test_x = vsx
         self.train_x = tsx
+        self.eta = eta
+        self.epochs = epochs
         self.arch = []
         self.inp_train = None
         self.inp_test = None
@@ -41,7 +42,7 @@ class MLP:
 
     def train(self):
 
-        for _ in trange(epochs):
+        for _ in trange(self.epochs):
             fp = self.inp_test
             for layer in self.arch[1:-1]:
                 fp = layer.forwardPropagate(fp)
@@ -58,7 +59,7 @@ class MLP:
 
     def layerFactory(self, classStr):
         if (v := classStr.split())[0] == "FullyConnected":
-            return FullyConnectedLayer(int(v[1]), int(v[2]), learning_rate)
+            return FullyConnectedLayer(int(v[1]), int(v[2]), self.eta)
         elif classStr == "Sigmoid":
             return SigmoidLayer(None)
         elif classStr == "ReLu":
@@ -84,4 +85,3 @@ class MLP:
         print(f'Train Accuracies: {total_train * 100 / tyh.shape[0]}%')
         print(f'Validation Accuracies: {total_test * 100 / vyh.shape[0]}%')
         # print(f'\nTraining Accuracy: {accuracy_score(one_hot_decoder(self.train_y), self.train_y_hat):.2f}')
-

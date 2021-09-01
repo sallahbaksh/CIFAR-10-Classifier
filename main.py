@@ -24,7 +24,7 @@ if __name__ == '__main__':
     trainX = np.array(train[0][b'data'])
     trainY = np.array(train[0][b'labels'])
     # try:
-    mlp = MLP(trainX, trainY, test[b"data"], np.array(test[b"labels"]))
+    mlp = MLP(trainX, trainY, test[b"data"], np.array(test[b"labels"]), 10**-2, 1_000)
     # train_x = pd.read_csv('mnist_train_100.csv', header=None)
     # test_x = pd.read_csv('mnist_valid_10.csv', header=None)
     # train_y = train_x.pop(0).to_numpy()
