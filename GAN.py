@@ -1,4 +1,3 @@
-import pandas as pd
 import numpy as np
 from tqdm import trange
 from Layers import *
@@ -9,21 +8,20 @@ def one_hot_encoder(data):
     return np.squeeze(np.eye(np.max(data) + 1)[data.reshape(-1)])
 
 class GAN:
-    def __init__(self, eta, digit, train, labels, batch_size, epochs) -> None:
+    def __init__(self, eta, trainX_data, trainY_data, testX_data, testY_data, batch_size, epochs):
 
         # storing input parameters and data
         self.eta = eta
-        self.train = train.values
+        self.train = trainX_data
         self.batch_size = batch_size
-        self.digit = digit
         self.epochs = epochs
-        self.labels = labels
 
-        # selecting just the data needed for digit
-        temp =  pd.DataFrame(self.train[self.train[:, 0] == digit])
-        self.ytr = temp.pop(0).values
-        self.xtr = temp.values
+        self.ytr = trainY_data
+        self.xtr = trainX_data
         self.batches = self.xtr.shape[0] // self.batch_size
+
+        self.yte = testY_data
+        self.xte = testX_data
 
         # initializing common layer
         self.common_fcl = FullyConnectedLayer(
@@ -51,6 +49,8 @@ class GAN:
         # lists to track loss
         self.gen_loss = []
         self.disc_loss = []
+        self.class_loss_tr = []
+        self.class_loss_te = []
     
     def gen_forward_propagate(self,x):
         fcl_data = self.gen_fcl.forwardPropagate(x)
@@ -103,22 +103,33 @@ class GAN:
             # for i in range(self.batches):
             slicex = self.xtr[i*bs:(i+1)*bs]
             slicey = self.ytr[i*bs:(i+1)*bs].reshape(bs, 1)
-            slicey_label = one_hot_encoder(self.labels[i*bs:(i+1)*bs].reshape(bs,1))
+
+            # slicexte = self.xte[i*bs:(i+1)*bs]
+            # sliceyte = self.yte[i*bs:(i+1)*bs].reshape(bs, 1)
+            slicexte = self.xte
+            sliceyte = self.yte
 
             slicey[slicey == self.digit] = 1
 
             self.disc_log_loss = LogLoss(np.vstack((slicey,np.zeros((bs,1)))))
-            self.class_ce = CrossEntropy(slicey_label)
+            self.class_ce = CrossEntropy(slicey)
             gen_output = self.gen_forward_propagate(self.gen_input(self.xtr))
 
             y_pred = self.disc_forward_propagate(np.vstack((slicex, gen_output)))
-            y_pred_class = self.class_forward_propagate(
-                np.vstack((slicex, gen_output)))
-
             self.disc_loss.append(self.disc_log_loss.eval(y_pred))
 
+            train_y_pred_class = self.class_forward_propagate(
+                np.vstack((slicex, gen_output)))
+
+            self.class_loss_tr.append(self.class_ce.eval(train_y_pred_class))
+
+            test_y_pred_class = self.class_forward_propagate(
+                np.vstack((slicexte, gen_output)))
+
+            self.class_loss_te.append(self.class_ce.eval(test_y_pred_class))
+
             self.disc_backward_propagate(y_pred) 
-            self.class_backward_propagate(y_pred_class)
+            self.class_backward_propagate(train_y_pred_class)
             gen_output = self.disc_forward_propagate(gen_output)
             self.gen_backward_propagate(gen_output)
             self.gen_loss.append(self.gen_logistic_loss.eval(gen_output))
