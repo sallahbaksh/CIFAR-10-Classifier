@@ -3,7 +3,7 @@ import numpy as np
 from Layers import *
 from ObjectiveFuncs import *
 from tqdm import trange
-from sklearn.metrics import accuracy_score
+
 
 
 def one_hot_encoder(data):
@@ -16,21 +16,22 @@ def one_hot_decoder(x):
 
 class MLP:
     def __init__(self, train_X, train_Y, test_X, test_Y, eta, epochs):
-            self.train_Y = one_hot_encoder(train_Y)
-            self.test_Y = one_hot_encoder(test_Y)
-            self.test_X = test_X
-            self.train_X = train_X
-            self.eta = eta
-            self.epochs = epochs
-            self.arch = []
-            self.inp_train = None
-            self.inp_test = None
-            self.train_y_hat = None
-            self.test_y_hat = None
+        self.train_Y = one_hot_encoder(train_Y)
+        self.test_Y = one_hot_encoder(test_Y)
+        self.test_X = test_X
+        self.train_X = train_X
+        self.eta = eta
+        self.epochs = epochs
+        self.arch = []
+        self.inp_train = None
+        self.inp_test = None
+        self.train_y_hat = None
+        self.test_y_hat = None
 
     def create_architecture(self, architecture: str):
-        """architecture: A comma separated string, with the input layer, hidden layers and the objective layer;
-                         The fully connected layer should display an input layer output layer (ex: FullyConnected 25)
+        """
+        architecture: A comma separated string, with the input layer, hidden layers and the objective layer;
+                      The fully connected layer should display an input layer output layer (ex: FullyConnected 25)
         """
         self.arch = list(map(self.layerFactory, list(map(str.strip, architecture.split(',')))))
         self.inp_train = self.arch[0].forwardPropagate(self.train_X)
@@ -55,9 +56,8 @@ class MLP:
             fp = self.arch[-1].gradient(self.train_y_hat)
             for layer in self.arch[-2:0: -1]:
                 fp = layer.backwardPropagate(fp)
-                
+
     def layerFactory(self, class_str):
-        v = [0, 0, 0]
         layer = {
             'Input': InputLayer(self.train_X),
             'Sigmoid': SigmoidLayer(None),
@@ -68,7 +68,7 @@ class MLP:
             'LogLoss': LogLoss(self.train_Y),
             'LeastSquares': LeastSquares(self.train_Y)
         }
-        
+
         if (v := class_str.split())[0] == 'FullyConnected':
             return FullyConnectedLayer(int(v[1]), int(v[2]), self.eta)
         elif class_str in layer:
@@ -81,4 +81,3 @@ class MLP:
         total_test = np.sum(np.equal(vyh := one_hot_decoder(self.test_y_hat), one_hot_decoder(self.test_Y)))
         print(f'Train Accuracies: {total_train * 100 / tyh.shape[0]}%')
         print(f'Validation Accuracies: {total_test * 100 / vyh.shape[0]}%')
-        # print(f'\nTraining Accuracy: {accuracy_score(one_hot_decoder(self.train_y), self.train_y_hat):.2f}')
