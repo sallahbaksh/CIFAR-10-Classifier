@@ -15,18 +15,18 @@ def one_hot_decoder(x):
 
 
 class MLP:
-def __init__(self, train_X, train_Y, test_X, test_Y, eta, epochs):
-        self.train_Y = one_hot_encoder(train_Y)
-        self.test_Y = one_hot_encoder(test_Y)
-        self.test_X = test_X
-        self.train_X = train_X
-        self.eta = eta
-        self.epochs = epochs
-        self.arch = []
-        self.inp_train = None
-        self.inp_test = None
-        self.train_y_hat = None
-        self.test_y_hat = None
+    def __init__(self, train_X, train_Y, test_X, test_Y, eta, epochs):
+            self.train_Y = one_hot_encoder(train_Y)
+            self.test_Y = one_hot_encoder(test_Y)
+            self.test_X = test_X
+            self.train_X = train_X
+            self.eta = eta
+            self.epochs = epochs
+            self.arch = []
+            self.inp_train = None
+            self.inp_test = None
+            self.train_y_hat = None
+            self.test_y_hat = None
 
     def create_architecture(self, architecture: str):
         """architecture: A comma separated string, with the input layer, hidden layers and the objective layer;
