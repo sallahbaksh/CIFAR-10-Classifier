@@ -3,3 +3,4 @@ __pycache__/
 mnist*
 ritik_test.py
 softmax.py
+.idea/*
