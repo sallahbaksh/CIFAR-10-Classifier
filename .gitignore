@@ -1,6 +1,7 @@
 __pycache__/
 .vscode/
 mnist*
-ritik_test.py
+ritik*
+GANV2.py
 softmax.py
 .idea/*

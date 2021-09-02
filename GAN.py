@@ -16,11 +16,11 @@ class GAN:
 
         # storing input parameters and data
         self.eta = eta
-        self.train = trainX_data[:10000]
+        self.train = trainX_data
         self.batch_size = batch_size
         self.epochs = epochs
 
-        self.ytr = trainY_data[:10000]
+        self.ytr = trainY_data
         self.xtr = trainX_data
         self.batches = self.xtr.shape[0] // self.batch_size
 
@@ -46,9 +46,9 @@ class GAN:
 
         # initializing classifier
         self.class_fcl = FullyConnectedLayer(self.xtr.shape[1], 10, self.eta)
-        # self.class_sm = SoftmaxLayer(self.class_fcl.forwardPropagate(
-        #     common_data))
-        self.class_sm = Softmax()
+        self.class_sm = SoftmaxLayer(self.class_fcl.forwardPropagate(
+            common_data))
+        # self.class_sm = Softmax()
         self.class_ce_tr = None
         self.class_ce_te = None
 
@@ -99,8 +99,8 @@ class GAN:
 
     def class_backward_propagate(self, y_pred):
         ce_grad = self.class_ce_tr.gradient(y_pred)
-        sm_grad = self.class_sm.backwardPropagate(y_pred, self.slicey_ohe, ce_grad)
-        # sm_grad = self.class_sm.backwardPropagate(ce_grad)
+        # sm_grad = self.class_sm.backward(y_pred, self.slicey_ohe, ce_grad)
+        sm_grad = self.class_sm.backwardPropagate(ce_grad)
         fcl_grad = self.class_fcl.simpleBackwardPropagate(sm_grad, self.eta)
         tanh_grad = self.common_tanh.backwardPropagate(fcl_grad)
         self.common_fcl.simpleBackwardPropagate(tanh_grad, self.eta)
@@ -112,45 +112,51 @@ class GAN:
 
         bs = self.batch_size
 
-        for _ in range(self.epochs):
-            for i in trange(self.batches):
-                slicex = self.xtr[i*bs:(i+1)*bs]
-                slicey = self.ytr[i*bs:(i+1)*bs].reshape(bs, 1)
+        for i in trange(self.epochs):
+            # for i in trange(self.batches):
+            slicex = self.xtr[i*bs:(i+1)*bs]
+            slicey = self.ytr[i*bs:(i+1)*bs].reshape(bs, 1)
 
-                slicexte = self.xte
-                sliceyte = self.yte
+            slicexte = self.xte
+            sliceyte = self.yte
 
-                self.slicey_ohe = one_hot_encoder(slicey)
-                self.sliceyte_ohe = one_hot_encoder(sliceyte)
+            self.slicey_ohe = one_hot_encoder(slicey)
+            self.sliceyte_ohe = one_hot_encoder(sliceyte)
 
-                self.disc_log_loss = LogLoss(
-                    np.vstack((slicey, np.zeros((bs, 1)))))
-                self.class_ce_tr = CrossEntropy(self.slicey_ohe)
-                self.class_ce_te = CrossEntropy(self.sliceyte_ohe)
-                gen_output = self.gen_forward_propagate(self.gen_input(self.xtr))
+            self.disc_log_loss = LogLoss(
+                np.vstack((slicey, np.zeros((bs, 1)))))
+            self.class_ce_tr = CrossEntropy(self.slicey_ohe)
+            self.class_ce_te = CrossEntropy(self.sliceyte_ohe)
+            gen_output = self.gen_forward_propagate(self.gen_input(self.xtr))
 
-                y_pred = self.disc_forward_propagate(
-                    np.vstack((slicex, gen_output)))
-                self.disc_loss.append(self.disc_log_loss.eval(y_pred))
+            y_pred = self.disc_forward_propagate(
+                np.vstack((slicex, gen_output)))
+            self.disc_loss.append(self.disc_log_loss.eval(y_pred))
 
-                self.disc_backward_propagate(y_pred)
+            self.disc_backward_propagate(y_pred)
 
-                self.test_y_pred_class = self.class_forward_propagate(
-                    slicexte)
+            self.test_y_pred_class = self.class_forward_propagate(
+                slicexte)
 
-                self.class_loss_te.append(
-                    self.class_ce_te.eval(self.test_y_pred_class))
+            self.class_loss_te.append(
+                self.class_ce_te.eval(self.test_y_pred_class))
 
-                self.train_y_pred_class = self.class_forward_propagate(
-                    slicex)
+            self.train_y_pred_class = self.class_forward_propagate(
+                slicex)
 
-                self.class_loss_tr.append(
-                    self.class_ce_tr.eval(self.train_y_pred_class))
+            self.class_loss_tr.append(
+                self.class_ce_tr.eval(self.train_y_pred_class))
 
-                self.class_backward_propagate(self.train_y_pred_class)
-                gen_output = self.disc_forward_propagate(gen_output)
-                self.gen_backward_propagate(gen_output)
-                self.gen_loss.append(self.gen_logistic_loss.eval(gen_output))
+            self.class_backward_propagate(self.train_y_pred_class)
+            gen_output = self.disc_forward_propagate(gen_output)
+            self.gen_backward_propagate(gen_output)
+            self.gen_loss.append(self.gen_logistic_loss.eval(gen_output))
+
+            if i % 10 == 0:
+                print(
+                    f"Training accuracy with 10 hidden layer outputs: {self.train_accuracy()}")
+                print(
+                    f"Testing accuracy with 10 hidden layer outputs: {self.test_accuracy()}\n")
 
     def display_graph(self):
         plt.plot([j for j in range(len(self.class_loss_tr))],
