@@ -42,7 +42,7 @@ def train(x_train, y_train, optimizer_choice):
 
     model = CNN()
     cost = CrossEntropy(None)
-    eta = 0.005
+    eta = 0.005 if optimizer_choice != 1 else 0.0001
 
     optimizer = SGD(eta=eta, params=model.get_params()) if optimizer_choice != 1 else AdamGD(eta=eta, rho1=0.9,
                                                                                              rho2=0.999, epsilon=1e-8,
@@ -92,14 +92,14 @@ def train(x_train, y_train, optimizer_choice):
     loading_bar.close()
 
 
-def eval_efficiency(x_train, x_test, y_test):
-    x_test = (x_test - np.mean(x_train)) / np.std(x_train, ddof=1)
+def eval_efficiency(x_train, x_test, y_test, optimizer_choice):
+    x_test = InputLayer(x_train).forwardPropagate(x_test)
     x_test = resize_dataset(x_test)
     y_test = one_hot_encoding(y_test)
 
     cost = CrossEntropy(None)
     model = CNN()
-    model = load_params_from_file(model)
+    model = load_params_from_file(model, optimizer_choice)
 
     print("--------------------EVALUATION-------------------\n")
 
@@ -132,4 +132,4 @@ if __name__ == '__main__':
     choice = int(input("1 for ADAM, 0 for Reg:\n"))
     train_x, train_y, test_x, test_y = preprocess()
     train(train_x, train_y, choice)
-    eval_efficiency(train_x, test_x, test_y)
+    eval_efficiency(train_x, test_x, test_y, choice)

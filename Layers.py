@@ -248,12 +248,12 @@ def save_params_to_file(model, optimizer_choice):
             "the path to it in the \'terminal_path\' list and the run the function again.")
 
     weights = model.get_params()
-    with open(dirPath + "final_weights.pkl" + ("ADAM" if optimizer_choice else ""), "wb") as f:
+    with open(dirPath + "final_weights" + ("_ADAM" if optimizer_choice else "") + ".pkl", "wb") as f:
         pickle.dump(weights, f)
 
 
 def load_params_from_file(model, optimizer_choice):
-    terminal_path = ["./save_weights/final_weights.pkl" + ("ADAM" if optimizer_choice else "")]
+    terminal_path = ["./save_weights/final_weights" + ("_ADAM" if optimizer_choice else "") + ".pkl"]
 
     filePath = None
     for path in terminal_path:

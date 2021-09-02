@@ -89,7 +89,7 @@ class SGD:
         return self.params
 
 
-class AdamGD():
+class AdamGD:
 
     def __init__(self, eta, rho1, rho2, epsilon, params):
         self.eta = eta
