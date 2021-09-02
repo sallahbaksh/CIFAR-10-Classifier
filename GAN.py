@@ -81,7 +81,7 @@ class GAN:
         common_obj = self.common_tanh.forwardPropagate(common_fcl)
 
         class_fcl = self.class_fcl.forwardPropagate(common_obj)
-        return self.class_sm.forward(class_fcl)
+        return self.class_sm.forwardPropagate(class_fcl)
 
     def disc_forward_propagate(self, x):
         common_fcl = self.common_fcl.forwardPropagate(x)
@@ -99,7 +99,7 @@ class GAN:
 
     def class_backward_propagate(self, y_pred):
         ce_grad = self.class_ce_tr.gradient(y_pred)
-        sm_grad = self.class_sm.backward(y_pred, self.slicey_ohe, ce_grad)
+        sm_grad = self.class_sm.backwardPropagate(y_pred, self.slicey_ohe, ce_grad)
         # sm_grad = self.class_sm.backwardPropagate(ce_grad)
         fcl_grad = self.class_fcl.simpleBackwardPropagate(sm_grad, self.eta)
         tanh_grad = self.common_tanh.backwardPropagate(fcl_grad)
