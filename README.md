@@ -28,13 +28,13 @@ The following dependencies are required:<br/>
 
 If using Anaconda with Python 3.8+, everything above is included except `tqdm` and `concurrent.futures`. 
 
-To add `tqdm, run:
+To add `tqdm`, run:
 
 ```bash
 conda install -c conda-forge tqdm
 ```
 
-To add concurrent.futures, run:
+To add `concurrent.futures`, run:
 ```bash
 conda install -c anaconda futures
 ```
