@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Four deep learning models were implemented to classify images from the [CIFAR-10](http://www.cs.toronto.edu/~kriz/cifar.html) dataset.
+Four deep learning models (ANN, MLP, CNN, and GAN) were implemented to classify images from the [CIFAR-10](http://www.cs.toronto.edu/~kriz/cifar.html) dataset.
 
 ## Getting Started
 
