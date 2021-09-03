@@ -152,11 +152,11 @@ class GAN:
             self.gen_backward_propagate(gen_output)
             self.gen_loss.append(self.gen_logistic_loss.eval(gen_output))
 
-            # if i % 10 == 0:
-            #     print(
-            #         f"Training accuracy with 10 hidden layer outputs: {self.train_accuracy()}")
-            #     print(
-            #         f"Testing accuracy with 10 hidden layer outputs: {self.test_accuracy()}\n")
+            if i % 10 == 0:
+                print(
+                    f"Training accuracy with 10 hidden layer outputs: {self.train_accuracy()}")
+                print(
+                    f"Testing accuracy with 10 hidden layer outputs: {self.test_accuracy()}\n")
 
     def display_graph(self):
         plt.plot([j for j in range(len(self.class_loss_tr))],
